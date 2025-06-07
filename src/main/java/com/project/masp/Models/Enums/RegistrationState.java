@@ -1,6 +1,6 @@
 package com.project.masp.Models.Enums;
 
-public enum SeekState {
+public enum RegistrationState {
     Active,
     Complete
 }

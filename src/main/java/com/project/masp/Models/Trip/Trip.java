@@ -1,11 +1,29 @@
-package com.project.masp.Models;
+package com.project.masp.Models.Trip;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.project.masp.Models.Company.Company;
 import com.project.masp.Models.Enums.RegistrationState;
+import com.project.masp.Models.TouristService.HotelInTrip;
+import com.project.masp.Models.TouristService.VehicleInTrip;
+import com.project.masp.Models.Users.Organiser;
+import com.project.masp.Models.Users.TripManager;
+import com.project.masp.Models.Users.User;
+import com.project.masp.Models.Users.UserInTrip;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Data
 public class Trip {
     private String name;
     private LocalDate registrationDateEnd;
@@ -16,24 +34,48 @@ public class Trip {
     private String programDescription;
     private int numberOfUsersInGroup;
     private double price;
-    private List<String> images;
     private RegistrationState registrationState;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-    public Trip() {
+    private Long id;
 
-    }
+    @OneToMany(mappedBy = "trip")
+    @Builder.Default
+    @JsonManagedReference
+    private List<HotelInTrip> hotelsInTrip= new ArrayList<>();
 
-    public Trip(LocalDate startDate, String name, LocalDate onBoardDateEnd, String departurePoint, String arrivalPoint, LocalDate endDate, String programDescription, int numberOfUsersInGroup, double price, ArrayList<String> images, RegistrationState registrationState) {
-        this.startDate = startDate;
-        this.name = name;
-        this.registrationDateEnd = onBoardDateEnd;
-        this.departurePoint = departurePoint;
-        this.arrivalPoint = arrivalPoint;
-        this.endDate = endDate;
-        this.programDescription = programDescription;
-        this.numberOfUsersInGroup = numberOfUsersInGroup;
-        this.price = price;
-        this.images = images;
-        this.registrationState = registrationState;
-    }
+    @OneToMany(mappedBy = "trip")
+    @Builder.Default
+    @JsonManagedReference
+    private List<VehicleInTrip> vehiclesInTrip = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "company_id")
+    @JsonIgnore
+    private Company company;
+
+    @OneToMany(mappedBy = "trip")
+    @Builder.Default
+    @JsonIgnore
+    private List<Announcement> announcement = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(name = "trip_managers",
+            joinColumns = {@JoinColumn(name = "tripManager_id")},
+    inverseJoinColumns = {@JoinColumn(name = "trip_id")})
+    @Builder.Default
+    @JsonIgnore
+    private List<TripManager> tripManager = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "organiser_id")
+    @JsonIgnore
+    private Organiser organiser;
+
+
+    @OneToMany(mappedBy = "trip")
+    @Builder.Default
+    @JsonManagedReference
+    private List<UserInTrip> users = new ArrayList<>();
 }
