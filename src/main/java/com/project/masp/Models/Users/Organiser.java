@@ -1,6 +1,7 @@
 package com.project.masp.Models.Users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.project.masp.Models.TouristService.TouristServices;
 import com.project.masp.Models.Trip.Trip;
 import jakarta.persistence.Entity;
@@ -31,6 +32,7 @@ public class Organiser extends Employee {
 
     @OneToMany(mappedBy = "organiser")
     @Builder.Default
+    @JsonManagedReference
     private List<Trip> trips = new ArrayList<>();
 
     @OneToMany(mappedBy = "organiser")

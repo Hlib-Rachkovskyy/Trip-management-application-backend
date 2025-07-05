@@ -27,4 +27,6 @@ public class Hotel extends TouristServices {
     @Builder.Default
     @JsonBackReference
     List<HotelInTrip> hotelInTripList = new ArrayList<>();
+
+
 }

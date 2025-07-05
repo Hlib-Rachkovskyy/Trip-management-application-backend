@@ -1,17 +1,17 @@
 package com.project.masp.Controlers;
 
-import com.project.masp.Models.Enums.Role;
-import com.project.masp.Models.Trip.Trip;
-import com.project.masp.Models.Users.User;
-import com.project.masp.Models.Users.UserInTrip;
-import com.project.masp.Repository.TripRepository;
-import com.project.masp.Repository.UserInTripRepository;
-import com.project.masp.Repository.UserRepository;
+import com.project.masp.DTOs.*;
+import com.project.masp.Models.Enums.*;
+import com.project.masp.Models.Company.*;
+
+import com.project.masp.Models.Users.*;
+import com.project.masp.Models.Trip.*;
+import com.project.masp.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,12 +22,17 @@ public class UserController {
 
     private final TripRepository tripRepository;
     private final UserInTripRepository userInTripRepository;
-    UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final CompanyRepository companyRepository;
+    private final ContactFormRepository contactFormRepository;
+
     @Autowired
-    public UserController(UserRepository userRepository, TripRepository tripRepository, UserInTripRepository userInTripRepository) {
+    public UserController(UserRepository userRepository, TripRepository tripRepository, UserInTripRepository userInTripRepository, CompanyRepository companyRepository, ContactFormRepository contactFormRepository) {
         this.userRepository = userRepository;
         this.tripRepository = tripRepository;
         this.userInTripRepository = userInTripRepository;
+        this.companyRepository = companyRepository;
+        this.contactFormRepository = contactFormRepository;
     }
 
     @GetMapping("/user/{id}/trips")
@@ -35,24 +40,83 @@ public class UserController {
         return userRepository.findById(id).orElseThrow().getUserInTripList().stream().map(UserInTrip::getTrip).collect(Collectors.toList());
     }
 
-    @PostMapping("/user-trip/{tripId}/apply/")
-    public String Apply(@PathVariable Integer tripId){
-        User user =null; //userRepository.findById(userId).orElseThrow();
-        Trip trip = tripRepository.findById(tripId).orElseThrow();
-        var userInTrip = UserInTrip.builder()
-                .user(user)
+    @GetMapping("/user/{id}/trips/explore")
+    public List<Trip> UserTripsExplore(@PathVariable Integer id){
+        var userInTrip = userRepository.findById(id).orElseThrow().getUserInTripList();
+
+        return tripRepository.findTripsNotInUserInTrips(userInTrip);
+    }
+
+    @PostMapping("/user-trip/apply")
+    public ResponseEntity<?> applyToTrip(@RequestBody TripApplicationRequest request) {
+
+        User user = userRepository.findById(request.getUserId());
+        System.out.println(request.getUserId());
+        Trip trip = tripRepository.findById(request.getTripId());
+
+
+        boolean alreadyExists = userInTripRepository.existsByUserAndTrip(user, trip);
+        if (alreadyExists) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User is already registered to this trip.");
+        }
+
+        UserInTrip userInTrip = UserInTrip.builder()
+
                 .trip(trip)
                 .role(Role.Registered)
                 .registerDate(LocalDate.now())
-                .registrationOrder(2).
-                build();
+                .registrationOrder(trip.getUsers().size() + 1)
+                .user(user)
+                .build();
+
+        userInTrip.setUser(user);
+
+
         user.getUserInTripList().add(userInTrip);
         trip.getUsers().add(userInTrip);
 
+
+        userInTripRepository.save(userInTrip);
         tripRepository.save(trip);
         userRepository.save(user);
-        userInTripRepository.save(userInTrip);
-        return null;
+
+        return ResponseEntity.ok(userInTrip);
     }
+
+    @DeleteMapping("/user-trip/{tripId}/resign/{userId}")
+    public ResponseEntity<?> resignFromTrip(@PathVariable Long tripId, @PathVariable Long userId) {
+        UserInTrip userInTrip = userInTripRepository.findByTripIdAndUserId(tripId, userId);
+            if (userInTrip == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not registered in this trip.");
+            }
+
+            userInTripRepository.delete(userInTrip);
+            return ResponseEntity.ok("User successfully resigned from trip.");
+        }
+
+
+    @PostMapping("/submit")
+    public ResponseEntity<?> submitForm(@RequestBody ContactFormRequest request) {
+        Company company = companyRepository.findByName(request.getCompanyName());
+        if (company == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Company not found");
+        }
+
+        User user = userRepository.findById(request.getUserId());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        ContactForm form = ContactForm.builder()
+                .company(company)
+                .user(user)
+                .text(request.getText())
+                .sendDate(LocalDate.now())
+                .build();
+
+        contactFormRepository.save(form);
+        return ResponseEntity.ok("Contact form submitted");
+    }
+
 
 }

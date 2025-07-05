@@ -1,5 +1,6 @@
 package com.project.masp.Models.Trip;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.project.masp.Models.Company.Company;
@@ -70,7 +71,7 @@ public class Trip {
 
     @ManyToOne
     @JoinColumn(name = "organiser_id")
-    @JsonIgnore
+    @JsonBackReference
     private Organiser organiser;
 
 

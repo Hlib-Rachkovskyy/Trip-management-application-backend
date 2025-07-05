@@ -1,6 +1,7 @@
 package com.project.masp.Models.Users;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.masp.Models.Trip.Announcement;
 import com.project.masp.Models.Trip.Trip;
 import jakarta.persistence.*;
@@ -24,9 +25,11 @@ public class TripManager extends Employee {
 
     @OneToMany(mappedBy = "tripManager")
     @Builder.Default
+    @JsonIgnore
     private List<Announcement> announcements = new ArrayList<>();
 
     @ManyToMany(mappedBy = "tripManager")
     @Builder.Default
+    @JsonIgnore
     private List<Trip> trips = new ArrayList<>();
 }

@@ -37,7 +37,7 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     @Builder.Default
-    @JsonIgnore
+    @JsonBackReference
     private List<ContactForm> contactFormList = new ArrayList<>();
     @OneToMany(mappedBy = "user")
     @Builder.Default

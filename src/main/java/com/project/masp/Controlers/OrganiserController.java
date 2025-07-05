@@ -1,10 +1,15 @@
 package com.project.masp.Controlers;
 
+import com.project.masp.DTOs.TripApplicationRequest;
+import com.project.masp.DTOs.TripCreateRequest;
+import com.project.masp.Models.Company.Company;
+import com.project.masp.Models.Enums.RegistrationState;
+import com.project.masp.Models.Enums.Role;
 import com.project.masp.Models.Trip.Trip;
-import com.project.masp.Models.Users.User;
+import com.project.masp.Models.Users.Organiser;
 import com.project.masp.Models.Users.UserInTrip;
-import com.project.masp.Repository.OrganiserRepository;
-import com.project.masp.Repository.UserRepository;
+import com.project.masp.Repository.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,10 +18,20 @@ import java.util.List;
 public class OrganiserController {
     private final UserRepository userRepository;
     private final OrganiserRepository organiserRepository;
+    private final TripRepository tripRepository;
+    private final UserInTripRepository userInTripRepository;
+    private final CompanyRepository companyRepository;
 
-    public OrganiserController(UserRepository userRepository, OrganiserRepository organiserRepository) {
+    public OrganiserController(UserRepository userRepository, OrganiserRepository organiserRepository, TripRepository tripRepository, UserInTripRepository userInTripRepository, CompanyRepository companyRepository) {
         this.userRepository = userRepository;
         this.organiserRepository = organiserRepository;
+        this.tripRepository = tripRepository;
+        this.userInTripRepository = userInTripRepository;
+        this.companyRepository = companyRepository;
+    }
+    @GetMapping("/organiser/{id}")
+    public Organiser findOrganiser(@PathVariable Long id) {
+        return organiserRepository.findById(id);
     }
 
     @GetMapping("/organiser/{id}/trips/{tripId}/users")
@@ -31,6 +46,32 @@ public class OrganiserController {
         return organiserRepository.findById(id).orElseThrow().getTrips();
     }
 
+    @PostMapping("/organiser/trips")
+    public ResponseEntity<?> createTrip(@RequestBody TripCreateRequest dto) {
+        Company company = companyRepository.findById(dto.getCompanyId()).orElseThrow();
+        Organiser organiser = organiserRepository.findById(dto.getOrganiserId());
+
+        Trip trip = Trip.builder()
+                .name(dto.getName())
+                .registrationDateEnd(dto.getRegistrationDateEnd())
+                .departurePoint(dto.getDeparturePoint())
+                .arrivalPoint(dto.getArrivalPoint())
+                .startDate(dto.getStartDate())
+                .endDate(dto.getEndDate())
+                .programDescription(dto.getProgramDescription())
+                .numberOfUsersInGroup(dto.getNumberOfUsersInGroup())
+                .price(dto.getPrice())
+                .registrationState(RegistrationState.valueOf(dto.getRegistrationState()))
+                .company(company)
+                .organiser(organiser)
+                .build();
+
+        tripRepository.save(trip);
+
+        return ResponseEntity.ok(trip.getId());
+    }
+
+
     @GetMapping("/organiser/{id}/trips/{tripId}")
     public Trip OrganizerTrip(@PathVariable Integer id, @PathVariable Long tripId){
         return organiserRepository.findById(id).orElseThrow().getTrips()
@@ -38,75 +79,21 @@ public class OrganiserController {
                 .findFirst().orElseThrow();
     }
 
-
-
-
-
-
-
-
-    @GetMapping("/company/forms")
-    public String OrganiserCompanyForms(@RequestParam Long id){
-        return "User Company Forms " + id;
-    }
-
-    @PostMapping("/trip/aprove/{userId}")
-    public String OrganiserApprove(@PathVariable Long userId){
-        return "User Approve " + userId;
-    }
-
     @PostMapping("/trip/create")
-    public String CreateTrip(){
-        return "Trip created";
+    public Trip CreateTrip(@RequestBody Trip trip){
+        return tripRepository.save(trip);
     }
 
-    @DeleteMapping("/trip/delete/{tripId}")
-    public String DelteTrip(@RequestParam Long tripId){
-        return "User Create " + tripId;
+    @PutMapping("/user-trip/assign")
+    public ResponseEntity<?> assignToTrip(@RequestBody TripApplicationRequest request) {
+
+        UserInTrip userInTrip = userInTripRepository.findByTripIdAndUserId(request.getTripId(), request.getUserId());
+        userInTrip.setRole(Role.isPartOfTrip);
+
+        userInTripRepository.save(userInTrip);
+
+        return ResponseEntity.ok(userInTrip);
     }
 
-    @GetMapping("/company/managers/{companyId}")
-    public String OrganiserManagers(@RequestParam Long companyId){
-        return "User Managers " + companyId;
-    }
 
-    @PostMapping("/trip/create/trip={tripId}/{managerId}")
-    public String AssignManager(@RequestParam Long tripID, @RequestParam String managerId){
-        return "User Assign Manager " + tripID;
-    }
-
-    @PostMapping("/trip/edit/{tripId}")
-    public String EditTrip(@RequestParam Long tripID){
-        return "User Assign Manager " + tripID;
-    }
-
-    @GetMapping("/tourist-services/{companyId}")
-    public String TouristServices(@RequestParam Long companyId){
-        return "User Assign Manager " + companyId;
-    }
-
-    @PostMapping("/tourist-services/")
-    public String CreateTouristServices(@RequestParam Long employeeId){
-        return "User Assign Manager " + employeeId;
-    }
-
-    @DeleteMapping("/tourist-services/{touristServiceId}")
-    public String DeleteTouristServices(@RequestParam Long touristServiceId){
-        return "User Assign Manager " + touristServiceId;
-    }
-
-    @PutMapping("/tourist-services/{touristServiceId}")
-    public String EditTouristService(@RequestParam Long touristServiceId){
-        return "User Assign Manager " + touristServiceId;
-    }
-
-    @DeleteMapping("/trip={tripId}/tourist-services={touristServiceId}")
-    public String DeleteTouristServiceFromTrip(@RequestParam Long touristServiceId, @RequestParam Long tripId){
-        return "User Assign Manager " + touristServiceId;
-    }
-
-    @PostMapping("/trip={tripId}/tourist-services={touristServiceId}")
-    public String AddTouristServiceToTrip(@RequestParam Long touristServiceId, @RequestParam Long tripId){
-        return "User Assign Manager " + touristServiceId;
-    }
 }

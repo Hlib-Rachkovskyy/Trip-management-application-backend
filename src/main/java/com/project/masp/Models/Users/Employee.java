@@ -1,6 +1,7 @@
 package com.project.masp.Models.Users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.project.masp.Models.Company.Company;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,6 @@ public abstract class Employee {
 
     @ManyToOne
     @JoinColumn(name = "company_id")
-    @JsonIgnore
+    @JsonManagedReference
     private Company company;
 }

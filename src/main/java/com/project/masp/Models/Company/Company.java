@@ -1,5 +1,7 @@
 package com.project.masp.Models.Company;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.masp.Models.Trip.Trip;
 import com.project.masp.Models.Users.Employee;
 import jakarta.persistence.*;
@@ -35,12 +37,15 @@ public class Company {
 
     @OneToMany(mappedBy = "company")
     @Builder.Default
+    @JsonIgnore
     private List<Trip> trips = new ArrayList<>();
     @OneToMany(mappedBy = "company")
     @Builder.Default
+    @JsonBackReference
     private List<ContactForm> contactForms = new ArrayList<>();
     @OneToMany(mappedBy = "company")
     @Builder.Default
+    @JsonBackReference
     private List<Employee> employee = new ArrayList<>();
 
     public List<Employee> getEmployee() {

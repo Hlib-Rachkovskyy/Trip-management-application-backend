@@ -2,6 +2,7 @@ package com.project.masp.Models.Company;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.project.masp.Models.Users.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,10 +22,10 @@ public class ContactForm {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "company_id")
-    @JsonIgnore
+    @JsonManagedReference
     private Company company;
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonBackReference
+    @JsonManagedReference
     private User user;
 }
