@@ -13,7 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,15 +37,35 @@ public class UserController {
         this.contactFormRepository = contactFormRepository;
     }
 
+    @PostMapping("/contact-form/submit")
+    public void submitContactForm(@RequestBody ContactFormDTO contactFormDTO) {
+        System.out.println(contactFormDTO);
+        var user = userRepository.getReferenceById(1);
+        var company = companyRepository.getReferenceById(contactFormDTO.getCompanyId());
+        var sendDate = Instant.ofEpochMilli(contactFormDTO.getSendDate()).atZone(ZoneId.of("UTC")).toLocalDate();
+
+        ContactForm contactForm = ContactForm.builder()
+                .user(user)
+                .company(company)
+                .sendDate(sendDate)
+                .text(contactFormDTO.getText())
+                .build();
+        contactFormRepository.save(contactForm);
+    }
+
+    @GetMapping("/companies")
+    public List<Company> getCompaniesNames(){
+        return companyRepository.findAll();
+    }
+
     @GetMapping("/user/{id}/trips")
     public List<Trip> UserTrips(@PathVariable Integer id){
         return userRepository.findById(id).orElseThrow().getUserInTripList().stream().map(UserInTrip::getTrip).collect(Collectors.toList());
     }
 
-    @GetMapping("/user/{id}/trips/explore")
+    @GetMapping("/user/{id}/explore")
     public List<Trip> UserTripsExplore(@PathVariable Integer id){
         var userInTrip = userRepository.findById(id).orElseThrow().getUserInTripList();
-
         return tripRepository.findTripsNotInUserInTrips(userInTrip);
     }
 
@@ -93,10 +115,10 @@ public class UserController {
             userInTripRepository.delete(userInTrip);
             return ResponseEntity.ok("User successfully resigned from trip.");
         }
-
+/*
 
     @PostMapping("/submit")
-    public ResponseEntity<?> submitForm(@RequestBody ContactFormRequest request) {
+    public ResponseEntity<?> submitForm(@RequestBody ContactFormDTO request) {
         Company company = companyRepository.findByName(request.getCompanyName());
         if (company == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Company not found");
@@ -116,7 +138,7 @@ public class UserController {
 
         contactFormRepository.save(form);
         return ResponseEntity.ok("Contact form submitted");
-    }
+    }*/
 
 
 }

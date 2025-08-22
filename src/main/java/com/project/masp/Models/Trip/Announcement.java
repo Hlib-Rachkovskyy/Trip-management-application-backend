@@ -1,6 +1,9 @@
 package com.project.masp.Models.Trip;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.project.masp.Models.Users.TripManager;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,9 +27,11 @@ public class Announcement {
 
     @ManyToOne
     @JoinColumn(name = "trip_id")
+    @JsonBackReference
     private Trip trip;
 
     @ManyToOne
     @JoinColumn(name = "tripManager_id")
+    @JsonIgnore
     private TripManager tripManager;
 }

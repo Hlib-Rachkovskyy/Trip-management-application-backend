@@ -2,13 +2,11 @@ package com.project.masp.Models.Company;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.project.masp.Models.Trip.Trip;
 import com.project.masp.Models.Users.Employee;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,14 +39,12 @@ public class Company {
     private List<Trip> trips = new ArrayList<>();
     @OneToMany(mappedBy = "company")
     @Builder.Default
-    @JsonBackReference
+    @JsonManagedReference
     private List<ContactForm> contactForms = new ArrayList<>();
+    @Getter
     @OneToMany(mappedBy = "company")
     @Builder.Default
     @JsonBackReference
     private List<Employee> employee = new ArrayList<>();
 
-    public List<Employee> getEmployee() {
-        return employee;
-    }
 }

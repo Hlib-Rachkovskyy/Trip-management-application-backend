@@ -7,7 +7,9 @@ import com.project.masp.Models.Users.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Entity
 @NoArgsConstructor
@@ -22,10 +24,10 @@ public class ContactForm {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "company_id")
-    @JsonManagedReference
+    @JsonBackReference
     private Company company;
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonManagedReference
+    @JsonIgnore // JsonManagedReference
     private User user;
 }

@@ -58,7 +58,7 @@ public class Trip {
 
     @OneToMany(mappedBy = "trip")
     @Builder.Default
-    @JsonIgnore
+    @JsonManagedReference
     private List<Announcement> announcement = new ArrayList<>();
 
     @ManyToMany
@@ -66,7 +66,7 @@ public class Trip {
             joinColumns = {@JoinColumn(name = "tripManager_id")},
     inverseJoinColumns = {@JoinColumn(name = "trip_id")})
     @Builder.Default
-    @JsonIgnore
+    @JsonBackReference
     private List<TripManager> tripManager = new ArrayList<>();
 
     @ManyToOne
