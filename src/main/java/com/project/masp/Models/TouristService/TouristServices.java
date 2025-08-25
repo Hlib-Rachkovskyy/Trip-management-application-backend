@@ -1,8 +1,10 @@
 package com.project.masp.Models.TouristService;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.project.masp.Models.Enums.Activity;
 import com.project.masp.Models.Users.Organiser;
+import com.project.masp.Views;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @SuperBuilder
-
+@JsonView({Views.OrganiserTouristServicesView.class, Views.TripTouristServicesView.class})
 public abstract class TouristServices {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +32,6 @@ public abstract class TouristServices {
 
     @ManyToOne
     @JoinColumn(name = "organizer_id")
-    @JsonIgnore
+    @JsonView({Views.OrganiserTouristServicesView.class})
     private Organiser organiser;
 }

@@ -3,7 +3,9 @@ package com.project.masp.Models.Users;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.project.masp.Models.Company.ContactForm;
+import com.project.masp.Views;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +21,7 @@ import java.util.List;
 @Builder
 @Data
 @Table(name = "users")
+@JsonView({Views.UserTripsView.class, Views.ManagerView.class, Views.OrganiserView.class, Views.CompanyContactFormsView.class})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +29,6 @@ public class User {
     @Column(name = "Name", length = 100)
     private String name;
     @Column(name = "Surname", length = 100)
-
     private String surname;
     @Column(name = "Phone", length = 100)
     private String phoneNumber;
@@ -37,10 +39,11 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     @Builder.Default
-    @JsonIgnore
+    @JsonView({Views.UserContactFormsView.class})
     private List<ContactForm> contactFormList = new ArrayList<>();
+    
     @OneToMany(mappedBy = "user")
     @Builder.Default
-    @JsonBackReference
+    @JsonView({Views.UserTripsView.class})
     private List<UserInTrip> userInTripList = new ArrayList<>();
 }

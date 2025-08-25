@@ -1,6 +1,8 @@
 package com.project.masp.Models.TouristService;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.project.masp.Views;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,13 +19,14 @@ import java.util.List;
 @AllArgsConstructor
 @SuperBuilder
 @Data
+@JsonView({Views.OrganiserTouristServicesView.class, Views.TripTouristServicesView.class})
 public class Vehicle extends TouristServices {
     private String vehicleType;
     private String driverCompany;
 
     @OneToMany(mappedBy = "vehicle")
     @Builder.Default
-    @JsonBackReference
+    @JsonView({Views.TripTouristServicesView.class})
     private List<VehicleInTrip> vehiclesInTrip = new ArrayList<>();
 
 

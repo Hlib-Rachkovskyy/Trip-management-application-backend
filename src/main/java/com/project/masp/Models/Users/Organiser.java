@@ -2,8 +2,10 @@ package com.project.masp.Models.Users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.project.masp.Models.TouristService.TouristServices;
 import com.project.masp.Models.Trip.Trip;
+import com.project.masp.Views;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrimaryKeyJoinColumn;
@@ -23,6 +25,7 @@ import java.util.List;
 @AllArgsConstructor
 @SuperBuilder
 @Data
+@JsonView({Views.OrganiserView.class, Views.OrganiserTripsView.class, Views.ManagerView.class})
 public class Organiser extends Employee {
 
 
@@ -32,11 +35,11 @@ public class Organiser extends Employee {
 
     @OneToMany(mappedBy = "organiser")
     @Builder.Default
-    @JsonManagedReference
+    @JsonView({Views.OrganiserTripsView.class})
     private List<Trip> trips = new ArrayList<>();
 
     @OneToMany(mappedBy = "organiser")
     @Builder.Default
-    @JsonIgnore
+    @JsonView({Views.OrganiserTouristServicesView.class})
     private List<TouristServices> touristServices = new ArrayList<>();
 }

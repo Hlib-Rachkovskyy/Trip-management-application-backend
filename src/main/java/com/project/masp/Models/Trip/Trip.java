@@ -1,16 +1,15 @@
 package com.project.masp.Models.Trip;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.project.masp.Models.Company.Company;
 import com.project.masp.Models.Enums.RegistrationState;
 import com.project.masp.Models.TouristService.HotelInTrip;
 import com.project.masp.Models.TouristService.VehicleInTrip;
 import com.project.masp.Models.Users.Organiser;
 import com.project.masp.Models.Users.TripManager;
-import com.project.masp.Models.Users.User;
 import com.project.masp.Models.Users.UserInTrip;
+import com.project.masp.Views;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +24,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Data
+@JsonView({Views.UserView.class, Views.UserTripsView.class, Views.OrganiserView.class, Views.OrganiserTripsView.class, Views.ManagerView.class, Views.ManagerTripsView.class, Views.TripTouristServicesView.class})
 public class Trip {
     private String name;
     private LocalDate registrationDateEnd;
@@ -43,22 +43,22 @@ public class Trip {
 
     @OneToMany(mappedBy = "trip")
     @Builder.Default
-    @JsonManagedReference
+    @JsonView({Views.TripTouristServicesView.class})
     private List<HotelInTrip> hotelsInTrip= new ArrayList<>();
 
     @OneToMany(mappedBy = "trip")
     @Builder.Default
-    @JsonManagedReference
+    @JsonView({Views.TripTouristServicesView.class})
     private List<VehicleInTrip> vehiclesInTrip = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "company_id")
-    @JsonIgnore
+    @JsonView({Views.UserView.class, Views.OrganiserTripsView.class, Views.ManagerTripsView.class})
     private Company company;
 
     @OneToMany(mappedBy = "trip")
     @Builder.Default
-    @JsonManagedReference
+    @JsonView({Views.TripAnnouncementsView.class})
     private List<Announcement> announcement = new ArrayList<>();
 
     @ManyToMany
@@ -66,7 +66,7 @@ public class Trip {
             joinColumns = {@JoinColumn(name = "tripManager_id")},
     inverseJoinColumns = {@JoinColumn(name = "trip_id")})
     @Builder.Default
-    @JsonBackReference
+    @JsonView({Views.UserView.class})
     private List<TripManager> tripManager = new ArrayList<>();
 
     @ManyToOne
@@ -77,6 +77,6 @@ public class Trip {
 
     @OneToMany(mappedBy = "trip")
     @Builder.Default
-    @JsonManagedReference
+    @JsonView({Views.TripUsersView.class, Views.OrganiserTripsView.class})
     private List<UserInTrip> users = new ArrayList<>();
 }

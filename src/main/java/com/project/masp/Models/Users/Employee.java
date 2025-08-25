@@ -2,7 +2,9 @@ package com.project.masp.Models.Users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.project.masp.Models.Company.Company;
+import com.project.masp.Views;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +17,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @Data
 @SuperBuilder
+@JsonView({Views.UserView.class, Views.OrganiserView.class, Views.ManagerView.class})
 public abstract class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +31,6 @@ public abstract class Employee {
 
     @ManyToOne
     @JoinColumn(name = "company_id")
-    @JsonManagedReference
+    @JsonView({Views.OrganiserView.class, Views.UserView.class})
     private Company company;
 }

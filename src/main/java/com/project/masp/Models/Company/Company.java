@@ -3,8 +3,10 @@ package com.project.masp.Models.Company;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.project.masp.Models.Trip.Trip;
 import com.project.masp.Models.Users.Employee;
+import com.project.masp.Views;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,6 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Data
+@JsonView({Views.UserView.class, Views.OrganiserView.class, Views.CompanyTripsView.class, Views.CompanyContactFormsView.class, Views.CompanyEmployeesView.class})
 public class Company {
     @Column(name = "Name", length = 100)
     private String name;
@@ -35,16 +38,18 @@ public class Company {
 
     @OneToMany(mappedBy = "company")
     @Builder.Default
-    @JsonIgnore
+    @JsonView({Views.CompanyTripsView.class})
     private List<Trip> trips = new ArrayList<>();
+    
     @OneToMany(mappedBy = "company")
     @Builder.Default
-    @JsonManagedReference
+    @JsonView({Views.CompanyContactFormsView.class})
     private List<ContactForm> contactForms = new ArrayList<>();
+    
     @Getter
     @OneToMany(mappedBy = "company")
     @Builder.Default
-    @JsonBackReference
+    @JsonView({Views.CompanyEmployeesView.class})
     private List<Employee> employee = new ArrayList<>();
 
 }

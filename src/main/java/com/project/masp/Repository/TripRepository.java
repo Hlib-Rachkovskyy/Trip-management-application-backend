@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface TripRepository extends JpaRepository<Trip, Integer> {
+public interface TripRepository extends JpaRepository<Trip, Long> {
 
     @Query("""
     SELECT t FROM Trip t
@@ -19,6 +19,4 @@ public interface TripRepository extends JpaRepository<Trip, Integer> {
     )
 """)
     List<Trip> findTripsNotInUserInTrips(@Param("userInTrips") List<UserInTrip> userInTrips);
-
-    Trip findById(Long tripId);
 }

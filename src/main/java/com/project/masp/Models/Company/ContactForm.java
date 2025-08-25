@@ -3,7 +3,9 @@ package com.project.masp.Models.Company;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.project.masp.Models.Users.User;
+import com.project.masp.Views;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,6 +18,7 @@ import java.time.ZoneId;
 @AllArgsConstructor
 @Builder
 @Data
+@JsonView({Views.OrganiserView.class, Views.CompanyContactFormsView.class})
 public class ContactForm {
     private String text;
     private LocalDate sendDate;
@@ -28,6 +31,6 @@ public class ContactForm {
     private Company company;
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnore // JsonManagedReference
+    @JsonView({Views.OrganiserView.class, Views.CompanyContactFormsView.class})
     private User user;
 }

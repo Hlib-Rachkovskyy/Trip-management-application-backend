@@ -4,7 +4,9 @@ package com.project.masp.Models.Trip;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.project.masp.Models.Users.TripManager;
+import com.project.masp.Views;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +20,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @Data
+@JsonView({Views.UserView.class})
 public class Announcement {
     private LocalDate announcementDate;
     private String content;
