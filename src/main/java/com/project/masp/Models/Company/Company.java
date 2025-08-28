@@ -1,8 +1,5 @@
 package com.project.masp.Models.Company;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.project.masp.Models.Trip.Trip;
 import com.project.masp.Models.Users.Employee;
@@ -18,7 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Data
-@JsonView({Views.UserView.class, Views.OrganiserView.class, Views.CompanyTripsView.class, Views.CompanyContactFormsView.class, Views.CompanyEmployeesView.class})
+@JsonView({Views.ManagerView.class, Views.UserView.class, Views.OrganiserView.class, Views.CompanyEmployee.class,
+        Views.CompanyTripsView.class, Views.CompanyContactFormsView.class, Views.CompanyManagersView.class})
 public class Company {
     @Column(name = "Name", length = 100)
     private String name;
@@ -36,7 +34,7 @@ public class Company {
         this.description = description;
     }
 
-    @OneToMany(mappedBy = "company")
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @JsonView({Views.CompanyTripsView.class})
     private List<Trip> trips = new ArrayList<>();
@@ -47,9 +45,9 @@ public class Company {
     private List<ContactForm> contactForms = new ArrayList<>();
     
     @Getter
-    @OneToMany(mappedBy = "company")
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    @JsonView({Views.CompanyEmployeesView.class})
+    @JsonView({Views.CompanyContactFormsView.class, Views.CompanyEmployee.class})
     private List<Employee> employee = new ArrayList<>();
 
 }

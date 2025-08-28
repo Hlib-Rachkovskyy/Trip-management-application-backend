@@ -10,7 +10,6 @@ import com.project.masp.Models.Enums.Role;
 import com.project.masp.Models.Trip.Trip;
 import com.project.masp.Models.Users.Organiser;
 import com.project.masp.Models.Users.TripManager;
-import com.project.masp.Models.Users.User;
 import com.project.masp.Models.Users.UserInTrip;
 import com.project.masp.Repository.*;
 import com.project.masp.Views;
@@ -18,58 +17,42 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
 public class OrganiserController {
-    private final UserRepository userRepository;
     private final OrganiserRepository organiserRepository;
     private final TripRepository tripRepository;
     private final UserInTripRepository userInTripRepository;
     private final CompanyRepository companyRepository;
-    private final ContactFormRepository contactFormRepository;
+    private final TripManagerRepository tripManagerRepository;
 
-    public OrganiserController(UserRepository userRepository, OrganiserRepository organiserRepository, TripRepository tripRepository, UserInTripRepository userInTripRepository, CompanyRepository companyRepository, ContactFormRepository contactFormRepository) {
-        this.userRepository = userRepository;
+
+    public OrganiserController(UserRepository userRepository, OrganiserRepository organiserRepository, TripRepository tripRepository, UserInTripRepository userInTripRepository, CompanyRepository companyRepository, TripManagerRepository tripManagerRepository) {
         this.organiserRepository = organiserRepository;
         this.tripRepository = tripRepository;
         this.userInTripRepository = userInTripRepository;
         this.companyRepository = companyRepository;
-        this.contactFormRepository = contactFormRepository;
-    }
-    
-    // Using associations: Organiser -> Trip
-    @GetMapping("/organiser/{id}")
-    @JsonView({Views.OrganiserTripsView.class})
-    public Organiser findOrganiser(@PathVariable Long id) {
-        return organiserRepository.findById(id).orElseThrow();
+        this.tripManagerRepository = tripManagerRepository;
+
     }
 
-    // Using associations: Organiser -> Trip -> UserInTrip
-    @GetMapping("/organiser/{id}/trips/{tripId}/users")
-    @JsonView({Views.TripUsersView.class})
-    public Trip getOrganiserTripWithUsers(@PathVariable Long id, @PathVariable Long tripId){
-        return organiserRepository.findById(id).orElseThrow().getTrips()
-                .stream().filter(trip-> trip.getId().equals(tripId))
-                .findFirst().orElseThrow();
+    @GetMapping("/organiser/{id}") // add services
+    @JsonView({Views.OrganiserView.class})
+    public Optional<Organiser> getOrganiser(@PathVariable Long id) {
+        return organiserRepository.findById(id);
     }
 
-    // Using associations: Organiser -> Trip
-    @GetMapping("/organiser/{id}/trips")
-    @JsonView({Views.OrganiserTripsView.class})
-    public Organiser getOrganiserWithTrips(@PathVariable Long id){
-        return organiserRepository.findById(id).orElseThrow();
-    }
 
-    // Using associations: Company -> ContactForm
-    @GetMapping("/organiser/{id}/contact-forms")
+    // Association: Company -> ContactForm and Managers
+    @GetMapping("/organiser/company/{id}")
     @JsonView({Views.CompanyContactFormsView.class})
     public Company getOrganiserCompanyWithContactForms(@PathVariable Long id){
-        return organiserRepository.findById(id).orElseThrow().getCompany();
+        return companyRepository.findById(id).orElseThrow();
     }
 
-    @PostMapping("/organiser/trips")
+
+    @PostMapping("/organiser/trip")
     @JsonView({Views.OrganiserTripsView.class})
     public ResponseEntity<?> createTrip(@RequestBody TripCreateRequest dto) {
         Company company = companyRepository.findById(dto.getCompanyId()).orElseThrow();
@@ -90,28 +73,34 @@ public class OrganiserController {
                 .organiser(organiser)
                 .build();
 
-        tripRepository.save(trip);
 
-        return ResponseEntity.ok(trip.getId());
+        Trip savedTrip = tripRepository.save(trip);
+
+        return ResponseEntity.ok(savedTrip.getId());
+
     }
 
-    @GetMapping("/organiser/test")
-    @JsonView({Views.OrganiserView.class})
-    public Optional<Organiser> getOrganiser() { return organiserRepository.findById(1L); }
-
-    @GetMapping("/organiser/{id}/trips/{tripId}")
-    @JsonView({Views.TripUsersView.class})
-    public Trip OrganizerTrip(@PathVariable Long id, @PathVariable Long tripId){
-        return organiserRepository.findById(id).orElseThrow().getTrips()
-                .stream().filter(trip-> trip.getId().equals(tripId))
-                .findFirst().orElseThrow();
-    }
-
-    @PostMapping("/trip/create")
+    @PutMapping("/organiser/trip/{id}")
     @JsonView({Views.OrganiserTripsView.class})
-    public Trip CreateTrip(@RequestBody Trip trip){
-        return tripRepository.save(trip);
+    public ResponseEntity<?> updateTrip(@PathVariable Long id, @RequestBody TripCreateRequest dto) {
+        Trip existingTrip = tripRepository.findById(id).orElseThrow();
+
+        existingTrip.setName(dto.getName());
+        existingTrip.setRegistrationDateEnd(dto.getRegistrationDateEnd());
+        existingTrip.setDeparturePoint(dto.getDeparturePoint());
+        existingTrip.setArrivalPoint(dto.getArrivalPoint());
+        existingTrip.setStartDate(dto.getStartDate());
+        existingTrip.setEndDate(dto.getEndDate());
+        existingTrip.setProgramDescription(dto.getProgramDescription());
+        existingTrip.setNumberOfUsersInGroup(dto.getNumberOfUsersInGroup());
+        existingTrip.setPrice(dto.getPrice());
+        existingTrip.setRegistrationState(RegistrationState.valueOf(dto.getRegistrationState()));
+
+        tripRepository.save(existingTrip);
+
+        return ResponseEntity.ok(existingTrip.getId());
     }
+
 
     @PutMapping("/user-trip/assign")
     @JsonView({Views.TripUsersView.class})
@@ -136,32 +125,32 @@ public class OrganiserController {
         }
     }
 
-    // Mark contact form as read
-    @PutMapping("/contact-form/{formId}/mark-read")
-    @JsonView({Views.CompanyContactFormsView.class})
-    public ResponseEntity<?> markContactFormAsRead(@PathVariable Long formId) {
-        // This would require adding a 'read' field to ContactForm entity
-        // For now, just return success
-        return ResponseEntity.ok("Contact form marked as read");
-    }
-
-    // Get managers for assignment
-    @GetMapping("/manager/{companyId}")
-    @JsonView({Views.CompanyEmployeesView.class})
-    public Company getCompanyWithManagers(@PathVariable Long companyId){
-        return companyRepository.findById(companyId).orElseThrow();
-    }
 
     // Assign manager to trip
     @PostMapping("/assign/manager")
     @JsonView({Views.ManagerTripsView.class})
     public ResponseEntity<?> assignManagerToTrip(@RequestBody ManagerAssignmentRequest request) {
         Trip trip = tripRepository.findById(request.getTripId()).orElseThrow();
-        TripManager manager = trip.getTripManager().stream()
-                .filter(m -> m.getId().equals(request.getManagerId()))
-                .findFirst().orElseThrow();
-        
-        // Manager is already associated with trip through ManyToMany
-        return ResponseEntity.ok("Manager assigned to trip");
+
+        boolean isAlreadyAssigned = trip.getTripManager().stream()
+                .anyMatch(m -> m.getId().equals(request.getManagerId()));
+
+        if (isAlreadyAssigned) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("This manager is already assigned to this trip.");
+        }
+
+        TripManager manager = tripManagerRepository.findById(request.getManagerId())
+                .orElse(null);
+
+        if (manager == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("There's no manager with this id");
+        }
+
+        trip.getTripManager().add(manager);
+        tripRepository.save(trip);
+
+        return ResponseEntity.ok("Manager assigned to trip successfully");
     }
 }

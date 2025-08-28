@@ -24,7 +24,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Data
-@JsonView({Views.UserView.class, Views.UserTripsView.class, Views.OrganiserView.class, Views.OrganiserTripsView.class, Views.ManagerView.class, Views.ManagerTripsView.class, Views.TripTouristServicesView.class})
+@JsonView({Views.UserView.class,
+        Views.TripManagersView.class, Views.TripUsersView.class,  Views.UserTripsView.class, Views.OrganiserView.class, Views.OrganiserTripsView.class, Views.ManagerView.class, Views.ManagerTripsView.class})
 public class Trip {
     private String name;
     private LocalDate registrationDateEnd;
@@ -43,40 +44,40 @@ public class Trip {
 
     @OneToMany(mappedBy = "trip")
     @Builder.Default
-    @JsonView({Views.TripTouristServicesView.class})
+    @JsonView({Views.OrganiserView.class, Views.ManagerView.class})
     private List<HotelInTrip> hotelsInTrip= new ArrayList<>();
 
-    @OneToMany(mappedBy = "trip")
+    @OneToMany(mappedBy = "trip", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @Builder.Default
-    @JsonView({Views.TripTouristServicesView.class})
+    @JsonView({Views.OrganiserView.class, Views.ManagerView.class})
     private List<VehicleInTrip> vehiclesInTrip = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "company_id")
-    @JsonView({Views.UserView.class, Views.OrganiserTripsView.class, Views.ManagerTripsView.class})
+    @JsonView({Views.UserView.class})
     private Company company;
 
-    @OneToMany(mappedBy = "trip")
+    @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    @JsonView({Views.TripAnnouncementsView.class})
+    @JsonView({Views.UserView.class,
+            Views.TripAnnouncementsView.class})
     private List<Announcement> announcement = new ArrayList<>();
 
     @ManyToMany
-    @JoinTable(name = "trip_managers",
+    @JoinTable(name = "trip_managers", // think with cascade deletion
             joinColumns = {@JoinColumn(name = "tripManager_id")},
     inverseJoinColumns = {@JoinColumn(name = "trip_id")})
     @Builder.Default
-    @JsonView({Views.UserView.class})
+    @JsonView({Views.OrganiserView.class, Views.UserView.class})
     private List<TripManager> tripManager = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "organiser_id")
-    @JsonBackReference
+    @JsonView({Views.UserView.class})
     private Organiser organiser;
-
 
     @OneToMany(mappedBy = "trip")
     @Builder.Default
-    @JsonView({Views.TripUsersView.class, Views.OrganiserTripsView.class})
+    @JsonView({Views.OrganiserView.class, Views.TripUsersView.class, Views.ManagerView.class})
     private List<UserInTrip> users = new ArrayList<>();
 }

@@ -16,7 +16,7 @@ import java.time.temporal.ChronoUnit;
 @AllArgsConstructor
 @Builder
 @Data
-@JsonView({Views.TripTouristServicesView.class})
+@JsonView({Views.OrganiserView.class, Views.ManagerView.class})
 public class HotelInTrip {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,12 +32,12 @@ public class HotelInTrip {
     @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "hotel_id")
-    @JsonView({Views.TripTouristServicesView.class})
+    @JsonView({Views.OrganiserView.class, Views.ManagerView.class})
     private Hotel hotel;
 
     @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "trip_id")
-    @JsonView({Views.TripTouristServicesView.class})
+    @JsonIgnore
     private Trip trip;
 }

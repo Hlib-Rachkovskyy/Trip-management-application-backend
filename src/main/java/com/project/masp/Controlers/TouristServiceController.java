@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.project.masp.DTOs.HotelCreateRequest;
 import com.project.masp.DTOs.StatusUpdateRequest;
 import com.project.masp.DTOs.VehicleCreateRequest;
+import com.project.masp.Models.Enums.Activity;
 import com.project.masp.Models.TouristService.Hotel;
 import com.project.masp.Models.TouristService.Vehicle;
 import com.project.masp.Models.Users.Organiser;
@@ -105,9 +106,8 @@ public class TouristServiceController {
 
     // Status management endpoints
     @PutMapping("/tourist-service/{id}/status")
-    @JsonView({Views.TripTouristServicesView.class})
+    @JsonView({Views.ManagerView.class})
     public ResponseEntity<?> updateTouristServiceStatus(@PathVariable Long id, @RequestBody StatusUpdateRequest request) {
-        // Try to find hotel first
         Optional<Hotel> hotel = hotelRepository.findById(id);
         if (hotel.isPresent()) {
             hotel.get().setState(request.getNewStatus());
@@ -115,7 +115,6 @@ public class TouristServiceController {
             return ResponseEntity.ok(hotel.get());
         }
         
-        // Try to find vehicle
         Optional<Vehicle> vehicle = vehicleRepository.findById(id);
         if (vehicle.isPresent()) {
             vehicle.get().setState(request.getNewStatus());

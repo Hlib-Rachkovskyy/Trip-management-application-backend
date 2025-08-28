@@ -16,7 +16,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @Data
-@JsonView({Views.UserTripsView.class, Views.OrganiserView.class, Views.OrganiserTripsView.class, Views.ManagerView.class})
+@JsonView({Views.UserView.class, Views.ManagerView.class,
+        Views.TripUsersView.class, Views.UserTripsView.class, Views.OrganiserView.class})
 public class UserInTrip {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +28,7 @@ public class UserInTrip {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonView({Views.OrganiserView.class, Views.OrganiserTripsView.class, Views.ManagerView.class})
+    @JsonView({Views.TripUsersView.class, Views.OrganiserView.class, Views.ManagerView.class})
     private User user;
     
     @ManyToOne

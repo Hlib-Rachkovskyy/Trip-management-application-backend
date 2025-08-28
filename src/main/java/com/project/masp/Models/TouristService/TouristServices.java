@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @SuperBuilder
-@JsonView({Views.OrganiserTouristServicesView.class, Views.TripTouristServicesView.class})
+@JsonView({Views.OrganiserView.class, Views.ManagerView.class})
 public abstract class TouristServices {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

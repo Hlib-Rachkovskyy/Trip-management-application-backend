@@ -1,6 +1,7 @@
 package com.project.masp.Models.TouristService;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.project.masp.Views;
 import jakarta.persistence.*;
@@ -19,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @SuperBuilder
 @Data
-@JsonView({Views.OrganiserTouristServicesView.class, Views.TripTouristServicesView.class})
+@JsonView({Views.OrganiserView.class, Views.ManagerView.class})
 public class Hotel extends TouristServices {
     private String hotelWebsite;
     private String hotelAddress;
@@ -28,7 +29,7 @@ public class Hotel extends TouristServices {
 
     @OneToMany(mappedBy = "hotel")
     @Builder.Default
-    @JsonView({Views.TripTouristServicesView.class})
+    @JsonIgnore
     List<HotelInTrip> hotelInTripList = new ArrayList<>();
 
 

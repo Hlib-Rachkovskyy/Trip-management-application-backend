@@ -1,6 +1,7 @@
 package com.project.masp.Models.TouristService;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.project.masp.Models.Trip.Trip;
@@ -19,7 +20,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @Builder
 @Data
-@JsonView({Views.TripTouristServicesView.class})
+@JsonView({Views.OrganiserView.class, Views.ManagerView.class})
 public class VehicleInTrip {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,12 +32,12 @@ public class VehicleInTrip {
 
     @ManyToOne
     @JoinColumn(name = "vehicle_id")
-    @JsonView({Views.TripTouristServicesView.class})
+    @JsonView({Views.OrganiserView.class, Views.ManagerView.class})
     private Vehicle vehicle;
 
     @ManyToOne
     @JoinColumn(name = "trip_id")
-    @JsonView({Views.TripTouristServicesView.class})
+    @JsonIgnore
     private Trip trip;
 
 }

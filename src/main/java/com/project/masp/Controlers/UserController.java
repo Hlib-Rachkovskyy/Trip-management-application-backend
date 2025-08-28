@@ -30,17 +30,19 @@ public class UserController {
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
     private final ContactFormRepository contactFormRepository;
-    private final AnnouncementRepository announcementRepository;
 
     @Autowired
-    public UserController(UserRepository userRepository, TripRepository tripRepository, UserInTripRepository userInTripRepository, CompanyRepository companyRepository, ContactFormRepository contactFormRepository, AnnouncementRepository announcementRepository) {
+    public UserController(UserRepository userRepository, TripRepository tripRepository, UserInTripRepository userInTripRepository, CompanyRepository companyRepository, ContactFormRepository contactFormRepository) {
         this.userRepository = userRepository;
         this.tripRepository = tripRepository;
         this.userInTripRepository = userInTripRepository;
         this.companyRepository = companyRepository;
         this.contactFormRepository = contactFormRepository;
-        this.announcementRepository = announcementRepository;
     }
+
+    @GetMapping("/user/{id}")
+    @JsonView({Views.UserView.class})
+    public Optional<User> getAllUsers(@PathVariable Long id) { return userRepository.findById(id); }
 
     @PostMapping("/contact-form/submit")
     @JsonView({Views.UserContactFormsView.class})
@@ -59,21 +61,11 @@ public class UserController {
         contactFormRepository.save(contactForm);
     }
 
-    @GetMapping("/user/test")
-    @JsonView({Views.UserView.class})
-    public Optional<User> getAllUsers() { return userRepository.findById(1L); }
 
     @GetMapping("/companies")
-    @JsonView({Views.UserView.class})
+    @JsonView({Views.CompanyEmployee.class})
     public List<Company> getCompaniesNames(){
         return companyRepository.findAll();
-    }
-
-    // Using associations: User -> UserInTrip -> Trip
-    @GetMapping("/user/{id}/trips")
-    @JsonView({Views.UserTripsView.class})
-    public User getUserWithTrips(@PathVariable Long id){
-        return userRepository.findById(id).orElseThrow();
     }
 
     // Using associations: Get all trips and let frontend filter
@@ -83,19 +75,6 @@ public class UserController {
         return tripRepository.findAll();
     }
 
-    // Using associations: Trip -> Announcement
-    @GetMapping("/trip/{tripId}/announcements")
-    @JsonView({Views.TripAnnouncementsView.class})
-    public Trip getTripWithAnnouncements(@PathVariable Long tripId){
-        return tripRepository.findById(tripId).orElseThrow();
-    }
-
-    // Using associations: Trip -> TripManager
-    @GetMapping("/trip/{tripId}/manager")
-    @JsonView({Views.UserView.class})
-    public Trip getTripWithManager(@PathVariable Long tripId){
-        return tripRepository.findById(tripId).orElseThrow();
-    }
 
     @PostMapping("/user-trip/apply")
     @JsonView({Views.UserTripsView.class})
@@ -141,21 +120,5 @@ public class UserController {
             return ResponseEntity.ok("User successfully resigned from trip.");
         }
 
-    // Create announcement endpoint
-    @PostMapping("/announcement/create")
-    @JsonView({Views.TripAnnouncementsView.class})
-    public ResponseEntity<?> createAnnouncement(@RequestBody AnnouncementCreateRequest request) {
-        Trip trip = tripRepository.findById(request.getTripId()).orElseThrow();
-        TripManager manager = trip.getTripManager().get(0); // Assuming one manager per trip
-        
-        Announcement announcement = Announcement.builder()
-                .content(request.getContent())
-                .announcementDate(LocalDate.now())
-                .trip(trip)
-                .tripManager(manager)
-                .build();
-        
-        announcementRepository.save(announcement);
-        return ResponseEntity.ok(announcement);
-    }
+
 }

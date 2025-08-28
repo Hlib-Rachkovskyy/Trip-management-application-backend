@@ -20,7 +20,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @Data
-@JsonView({Views.UserView.class})
+@JsonView({Views.UserView.class,
+        Views.TripAnnouncementsView.class})
+
 public class Announcement {
     private LocalDate announcementDate;
     private String content;
@@ -35,6 +37,6 @@ public class Announcement {
 
     @ManyToOne
     @JoinColumn(name = "tripManager_id")
-    @JsonIgnore
+    @JsonView({Views.UserView.class})
     private TripManager tripManager;
 }

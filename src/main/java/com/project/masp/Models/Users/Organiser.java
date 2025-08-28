@@ -25,7 +25,8 @@ import java.util.List;
 @AllArgsConstructor
 @SuperBuilder
 @Data
-@JsonView({Views.OrganiserView.class, Views.OrganiserTripsView.class, Views.ManagerView.class})
+@JsonView({Views.OrganiserView.class, Views.UserView.class,
+        Views.OrganiserTripsView.class, Views.ManagerView.class, Views.CompanyEmployee.class})
 public class Organiser extends Employee {
 
 
@@ -35,11 +36,11 @@ public class Organiser extends Employee {
 
     @OneToMany(mappedBy = "organiser")
     @Builder.Default
-    @JsonView({Views.OrganiserTripsView.class})
+    @JsonView({Views.OrganiserView.class})
     private List<Trip> trips = new ArrayList<>();
 
     @OneToMany(mappedBy = "organiser")
     @Builder.Default
-    @JsonView({Views.OrganiserTouristServicesView.class})
+    @JsonIgnore
     private List<TouristServices> touristServices = new ArrayList<>();
 }

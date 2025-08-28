@@ -17,7 +17,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @Data
 @SuperBuilder
-@JsonView({Views.UserView.class, Views.OrganiserView.class, Views.ManagerView.class})
+@JsonView({Views.CompanyEmployee.class, Views.CompanyManagersView.class,
+        Views.UserView.class, Views.OrganiserView.class, Views.ManagerView.class})
 public abstract class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,11 +27,10 @@ public abstract class Employee {
     private String surname;
     private String phoneNumber;
     private String email;
-    private String companyName;
     private String country;
 
     @ManyToOne
     @JoinColumn(name = "company_id")
-    @JsonView({Views.OrganiserView.class, Views.UserView.class})
+    @JsonView({Views.OrganiserView.class, Views.ManagerView.class})
     private Company company;
 }

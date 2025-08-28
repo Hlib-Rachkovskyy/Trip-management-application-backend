@@ -21,7 +21,8 @@ import java.util.List;
 @Builder
 @Data
 @Table(name = "users")
-@JsonView({Views.UserTripsView.class, Views.ManagerView.class, Views.OrganiserView.class, Views.CompanyContactFormsView.class})
+@JsonView({Views.UserView.class, Views.ManagerView.class,
+        Views.TripUsersView.class,  Views.UserTripsView.class, Views.OrganiserView.class, Views.CompanyContactFormsView.class})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,6 +45,6 @@ public class User {
     
     @OneToMany(mappedBy = "user")
     @Builder.Default
-    @JsonView({Views.UserTripsView.class})
+    @JsonView({Views.UserView.class, Views.UserTripsView.class})
     private List<UserInTrip> userInTripList = new ArrayList<>();
 }
