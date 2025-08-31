@@ -44,11 +44,35 @@ public class UserController {
     @JsonView({Views.UserView.class})
     public Optional<User> getAllUsers(@PathVariable Long id) { return userRepository.findById(id); }
 
+    @PutMapping("/{userInTripId}/approve")
+    public ResponseEntity<UserInTrip> updateUserRole(
+            @PathVariable Long userInTripId) {
+
+        return userInTripRepository.findById(userInTripId)
+                .map(userInTrip -> {
+                    userInTrip.setRole(Role.isPartOfTrip);
+                    userInTripRepository.save(userInTrip);
+                    return ResponseEntity.ok(userInTrip);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{userInTripId}/connection")
+    public ResponseEntity<?> deleteUserFromTrip(@PathVariable Long userInTripId) {
+        return userInTripRepository.findById(userInTripId)
+                .map(userInTrip -> {
+                    userInTripRepository.delete(userInTrip);
+                    return ResponseEntity.noContent().build();
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+
+
     @PostMapping("/contact-form/submit")
     @JsonView({Views.UserContactFormsView.class})
     public void submitContactForm(@RequestBody ContactFormDTO contactFormDTO) {
-        System.out.println(contactFormDTO);
-        var user = userRepository.getReferenceById(1L);
+        var user = userRepository.getReferenceById(contactFormDTO.getUserId());
         var company = companyRepository.getReferenceById(contactFormDTO.getCompanyId());
         var sendDate = Instant.ofEpochMilli(contactFormDTO.getSendDate()).atZone(ZoneId.of("UTC")).toLocalDate();
 
@@ -68,7 +92,6 @@ public class UserController {
         return companyRepository.findAll();
     }
 
-    // Using associations: Get all trips and let frontend filter
     @GetMapping("/trips")
     @JsonView({Views.UserView.class})
     public List<Trip> getAllTrips(){
@@ -81,7 +104,6 @@ public class UserController {
     public ResponseEntity<?> applyToTrip(@RequestBody TripApplicationRequest request) {
 
         User user = userRepository.findById(request.getUserId()).orElseThrow();
-        System.out.println(request.getUserId());
         Trip trip = tripRepository.findById(request.getTripId()).orElseThrow();
 
         boolean alreadyExists = userInTripRepository.existsByUserAndTrip(user, trip);

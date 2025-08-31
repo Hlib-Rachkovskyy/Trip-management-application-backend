@@ -37,7 +37,7 @@ public class OrganiserController {
 
     }
 
-    @GetMapping("/organiser/{id}") // add services
+    @GetMapping("/organiser/{id}")
     @JsonView({Views.OrganiserView.class})
     public Optional<Organiser> getOrganiser(@PathVariable Long id) {
         return organiserRepository.findById(id);
@@ -126,7 +126,6 @@ public class OrganiserController {
     }
 
 
-    // Assign manager to trip
     @PostMapping("/assign/manager")
     @JsonView({Views.ManagerTripsView.class})
     public ResponseEntity<?> assignManagerToTrip(@RequestBody ManagerAssignmentRequest request) {

@@ -20,7 +20,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @Builder
 @Data
-@JsonView({Views.OrganiserView.class, Views.ManagerView.class})
+@JsonView({Views.UserView.class, Views.OrganiserView.class, Views.ManagerView.class})
 public class VehicleInTrip {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +32,7 @@ public class VehicleInTrip {
 
     @ManyToOne
     @JoinColumn(name = "vehicle_id")
-    @JsonView({Views.OrganiserView.class, Views.ManagerView.class})
+    @JsonView({Views.UserView.class, Views.OrganiserView.class, Views.ManagerView.class})
     private Vehicle vehicle;
 
     @ManyToOne

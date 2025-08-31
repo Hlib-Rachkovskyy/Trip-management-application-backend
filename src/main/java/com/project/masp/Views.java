@@ -6,7 +6,6 @@ public class Views {
     public static class ManagerView {}
     public static class OrganiserView {}
 
-    // Association-specific views
     public static class UserTripsView {} // User -> UserInTrip -> Trip
     public static class UserContactFormsView {} // User -> ContactForm
     public static class OrganiserTouristServicesView {} // Organiser -> TouristServices
@@ -26,7 +25,6 @@ public class Views {
 
     // Manager
     public static class ManagerAnnouncementsView {} // Manager -> Announcement |
-    public static class TripTouristServicesView {} // Trip -> HotelInTrip/VehicleInTrip |
     public static class ManagerTripsView {} // Manager -> Trips |
 
     public static class CompanyEmployee { }

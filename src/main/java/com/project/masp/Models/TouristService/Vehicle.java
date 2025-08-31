@@ -20,14 +20,14 @@ import java.util.List;
 @AllArgsConstructor
 @SuperBuilder
 @Data
-@JsonView({Views.OrganiserView.class, Views.OrganiserTouristServicesView.class, Views.ManagerView.class})
+@JsonView({Views.UserView.class, Views.OrganiserView.class, Views.OrganiserTouristServicesView.class, Views.ManagerView.class})
 public class Vehicle extends TouristServices {
     private String vehicleType;
     private String driverCompany;
 
-    @OneToMany(mappedBy = "vehicle")
+    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    @JsonIgnore // check for TripTouristServicesView if will need some changes
+    @JsonIgnore
     private List<VehicleInTrip> vehiclesInTrip = new ArrayList<>();
 
 

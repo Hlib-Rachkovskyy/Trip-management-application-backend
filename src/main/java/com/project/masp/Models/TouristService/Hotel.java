@@ -20,14 +20,14 @@ import java.util.List;
 @AllArgsConstructor
 @SuperBuilder
 @Data
-@JsonView({Views.OrganiserView.class, Views.ManagerView.class})
+@JsonView({Views.UserView.class, Views.OrganiserView.class, Views.ManagerView.class})
 public class Hotel extends TouristServices {
     private String hotelWebsite;
     private String hotelAddress;
     private String hotelEmail;
 
 
-    @OneToMany(mappedBy = "hotel")
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @JsonIgnore
     List<HotelInTrip> hotelInTripList = new ArrayList<>();

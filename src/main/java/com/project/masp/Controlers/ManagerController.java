@@ -42,7 +42,6 @@ public class ManagerController {
 
     // Association: Trip -> Tourist Services
     @GetMapping("/manager/trip/{id}/services")
-    @JsonView({Views.TripTouristServicesView.class})
     public Trip getTripTouristServices(@PathVariable Long id) {
         return tripRepository.findById(id).orElseThrow();
     }
@@ -54,12 +53,11 @@ public class ManagerController {
         return tripManagerRepository.findById(id).orElseThrow(); 
     }
 
-    // Create announcement endpoint
     @PostMapping("/announcement/create")
     @JsonView({Views.TripAnnouncementsView.class})
     public ResponseEntity<?> createAnnouncement(@RequestBody AnnouncementCreateRequest request) {
         Trip trip = tripRepository.findById(request.getTripId()).orElseThrow();
-        TripManager manager = trip.getTripManager().get(0); // Assuming one manager per trip
+        TripManager manager = trip.getTripManager().get(0);
 
         Announcement announcement = Announcement.builder()
                 .content(request.getContent())

@@ -44,12 +44,12 @@ public class Trip {
 
     @OneToMany(mappedBy = "trip")
     @Builder.Default
-    @JsonView({Views.OrganiserView.class, Views.ManagerView.class})
+    @JsonView({Views.UserView.class, Views.OrganiserView.class, Views.ManagerView.class})
     private List<HotelInTrip> hotelsInTrip= new ArrayList<>();
 
     @OneToMany(mappedBy = "trip", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @Builder.Default
-    @JsonView({Views.OrganiserView.class, Views.ManagerView.class})
+    @JsonView({Views.UserView.class, Views.OrganiserView.class, Views.ManagerView.class})
     private List<VehicleInTrip> vehiclesInTrip = new ArrayList<>();
 
     @ManyToOne
@@ -64,9 +64,9 @@ public class Trip {
     private List<Announcement> announcement = new ArrayList<>();
 
     @ManyToMany
-    @JoinTable(name = "trip_managers", // think with cascade deletion
-            joinColumns = {@JoinColumn(name = "tripManager_id")},
-    inverseJoinColumns = {@JoinColumn(name = "trip_id")})
+    @JoinTable(name = "trip_managers",
+            joinColumns = {@JoinColumn(name = "trip_id")},
+    inverseJoinColumns = {@JoinColumn(name = "trip_manager_id")})
     @Builder.Default
     @JsonView({Views.OrganiserView.class, Views.UserView.class})
     private List<TripManager> tripManager = new ArrayList<>();
