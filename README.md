@@ -2,7 +2,13 @@
 
 This guide will walk you through setting up the database, environment variables, and starting the backend server.
 
+This project is a Spring Boot application developed as part of a university course focused on Object-Oriented Programming (OOP) and UML-driven design.
+
+Detailed logic and architectural documentation are available in the documentation folder (available in Polish only).
+
 ## Prerequisites
+
+Maven
 
 ### 1. Database
 This project requires **PostgreSQL**. You need to have a Postgres server running and accepting connections.
@@ -17,25 +23,26 @@ You need to create two separate `.env` files to configure the application locall
 Create a file named `.env` inside your **backend** directory:
 ```env
 # PostgreSQL connection string
-DATABASE_URL=postgresql://postgres:yoursecretpassword@localhost:5431/postgres
-
-# JWT Secret Key for authentication
-SECRET_KEY=your-super-secret-key
+DATABASE=jdbc:postgresql://localhost:5432/postgres
+# PostgreSQL username
+DB_USERNAME=postgres
+# PostgreSQL password
+DB_PASSWORD=12345678
 ```
 ---
 ## Starting the Application locally
 
-### 1. Start the Backend (Flask)
+### 1. Start the Backend
 
-Install required Python packages:
+Build and Install Dependencies:
 
 ```bash
-pip install -r requirements.txt
+./mvnw clean install
 ```
-Start the Flask server:
+Start the Spring Boot server:
 
 ```bash
-python app.py
+./mvnw spring-boot:run
 ```
 ---
 ## Running app via Docker
